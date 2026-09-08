@@ -6,7 +6,7 @@ La entrega se realiza vía **aula.usm.cl** en formato `.zip`.
 
 ## Multiplicación de matrices
 
-Algoritmos evaluados: **Naive clasico** ($\mathcal{O}(N^3)$) y **Strassen** ($\mathcal{O}(N^{\log_2 7}) \approx \mathcal{O}(N^{2.81})$).
+Algoritmos evaluados: **Naive clasico** y **Strassen**  
 
 ### Programa principal
 
