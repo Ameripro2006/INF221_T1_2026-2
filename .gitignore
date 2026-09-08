@@ -1,0 +1,9 @@
+venv/
+tectonic
+__pycache__/
+*.o
+*.out
+*.aux
+*.log
+*.bcf
+*.run.xml

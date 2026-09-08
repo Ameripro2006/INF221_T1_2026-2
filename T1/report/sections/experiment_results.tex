@@ -1,0 +1,68 @@
+\subsection{Algoritmos de Ordenamiento}
+
+El análisis experimental expuso una clara sensibilidad de los algoritmos frente a la distribución previa de los datos:
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.52\textwidth]{figures/comparativa_aleatorio.png}
+    \caption{Rendimiento en caso aleatorio (escala log-log).}
+    \label{fig:sort_aleatorio}
+\end{figure}
+
+En la Figura \ref{fig:sort_aleatorio}, \texttt{std::sort} y \texttt{QuickSort} logran la menor latencia en arreglos masivos ($N = 10^7$) gracias a la localidad en caché L1/L2. \texttt{MergeSort} conserva estrictamente su tasa $\mathcal{O}(N \log N)$ penalizado por reservas dinámicas auxiliares. \texttt{PatienceSort} mantiene cota asintótica mediante montículos binarios, pero la administración dinámica de múltiples pilas eleva su constante multiplicativa.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/comparativa_ascendente.png}
+        \caption{Caso ordenado ascendente.}
+        \label{fig:sort_asc}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/comparativa_descendente.png}
+        \caption{Caso ordenado descendente.}
+        \label{fig:sort_desc}
+    \end{minipage}
+\end{figure}
+
+Las Figuras \ref{fig:sort_asc} y \ref{fig:sort_desc} evidencian el colapso cuadrático $\mathcal{O}(N^2)$ en implementaciones simples de \texttt{QuickSort} al seleccionar pivotes fijos desbalanceados. En contraposición, \texttt{MergeSort} y \texttt{std::sort} mitigan este efecto preservando tiempos subcuadráticos.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.50\textwidth]{figures/comparativa_dominios_n100k.png}
+    \caption{Impacto del dominio de valores ($N = 10^5$).}
+    \label{fig:sort_dom}
+\end{figure}
+
+En la Figura \ref{fig:sort_dom}, ante cardinalidad reducida de claves repetidas, \texttt{PatienceSort} reduce el número de pilas activas requeridas, mejorando sensiblemente su rendimiento frente a distribuciones aleatorias.
+
+\subsection{Multiplicación de Matrices}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.52\textwidth]{figures/comparativa_global_matrices.png}
+    \caption{Escalamiento general: Naive vs Strassen (escala log-log).}
+    \label{fig:mat_global}
+\end{figure}
+
+En la Figura \ref{fig:mat_global}, \textit{Naive} supera por 2 a 3 órdenes de magnitud a \textit{Strassen} en todos los tamaños evaluados ($N \le 1024$). La división recursiva profunda hasta $1 \times 1$ genera en $N=1024$ un árbol con $\approx 2.82 \times 10^8$ llamadas, saturando el gestor de memoria dinámica.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/impacto_tipo_matrices.png}
+        \caption{Estructura interna ($N = 256$).}
+        \label{fig:mat_tipo}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/impacto_dominio_matrices.png}
+        \caption{Dominio numérico ($N = 256$).}
+        \label{fig:mat_dominio}
+    \end{minipage}
+\end{figure}
+
+Las Figuras \ref{fig:mat_tipo} y \ref{fig:mat_dominio} confirman que la multiplicación matricial es invariante respecto al contenido de los datos: el número de operaciones es determinista e insensible a la densidad de ceros o al rango numérico evaluado.
