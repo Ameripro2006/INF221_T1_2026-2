@@ -1,5 +1,5 @@
 \subsection{Algoritmos de Ordenamiento}
-El análisis experimental expone una fuerte sensibilidad a la distribución inicial de los datos.
+El análisis experimental muestra una fuerte sensibilidad a la distribución inicial de los datos.
 
 \begin{figure}[H]
     \centering
@@ -17,7 +17,13 @@ El análisis experimental expone una fuerte sensibilidad a la distribución inic
     \end{minipage}
 \end{figure}
 
-En la Figura \ref{fig:t_aleatorio}, \texttt{std::sort} logra la menor latencia. QuickSort sufre una degradación catastrófica a $\mathcal{O}(N^2)$ con arreglos ordenados, consumiendo toda la pila (\textit{Stack Overflow}) o excediendo el límite de tiempo para $N \ge 10^6$. MergeSort conserva su tasa teórica $\mathcal{O}(N \log N)$, mientras que PatienceSort mantiene su cota pero con una alta constante multiplicativa. Respecto a la memoria (Figura \ref{fig:m_aleatorio}), \texttt{std::sort} domina operando \textit{in-place}, mientras MergeSort y PatienceSort exhiben un crecimiento $\mathcal{O}(N)$ por sus estructuras auxiliares.
+En la Figura \ref{fig:t_aleatorio}, \texttt{std::sort} es el más rápido. QuickSort se vuelve muy lento con arreglos ordenados porque su tiempo sube 
+a $\mathcal{O}(N^2)$, lo que agota la memoria de la pila (\textit{Stack Overflow}) o supera el tiempo límite para $N \ge 10^6$. 
+MergeSort mantiene su comportamiento teórico de $\mathcal{O}(N \log N)$, mientras que PatienceSort también lo cumple, pero demora más tiempo por tener 
+operaciones internas más pesadas.
+
+Respecto a la memoria (Figura \ref{fig:m_aleatorio}), \texttt{std::sort} es el más eficiente al trabajar directamente sobre el mismo arreglo 
+(\textit{in-place}), mientras que MergeSort y PatienceSort gastan más memoria a medida que crece el tamaño ($\mathcal{O}(N)$) debido a las estructuras auxiliares que usan.
 
 \begin{figure}[H]
     \centering
@@ -53,7 +59,10 @@ En la Figura \ref{fig:t_aleatorio}, \texttt{std::sort} logra la menor latencia. 
     \end{minipage}
 \end{figure}
 
-Naive supera por órdenes de magnitud a Strassen (Figura \ref{fig:t_matrices}). La recursividad profunda en $N=1024$ genera $\approx 3.29 \times 10^8$ llamadas, asfixiando la ganancia asintótica por el inmenso \textit{overhead}. Esto se refleja en la Figura \ref{fig:m_matrices}: Strassen exige una asignación masiva en el \textit{heap}, mientras Naive mantiene una huella estable $\mathcal{O}(N^2)$. El tiempo demostró ser agnóstico a la estructura y dominio de las matrices, ya que ninguna implementación omite cálculos sobre ceros.
+Naive es muchísimo más rápido que Strassen (Figura \ref{fig:t_matrices}). Al llegar a $N=1024$, tantas llamadas recursivas (cerca de $3.29 \times 10^8$) 
+generan un costo extra enorme que termina anulando cualquier ventaja teórica del algoritmo. Esto también se nota en la memoria (Figura \ref{fig:m_matrices}): 
+Strassen pide memoria dinámica constantemente (\textit{heap}), mientras que Naive mantiene un uso fijo y ordenado de $\mathcal{O}(N^2)$. Además, el tiempo de 
+ejecución no cambió según el tipo o los valores de las matrices, ya que ninguno de los dos algoritmos se salta operaciones cuando hay ceros.
 
 \begin{figure}[H]
     \centering

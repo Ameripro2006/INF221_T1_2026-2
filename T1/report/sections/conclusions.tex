@@ -1,1 +1,5 @@
-La notación asintótica teórica resulta insuficiente en entornos reales sin considerar la arquitectura. En ordenamiento, la topología inicial condiciona fatalmente la partición ingenua en QuickSort (causando \textit{Stack Overflow}) y el número de pilas en PatienceSort, destacando la robustez de MergeSort y \texttt{std::sort} (\textit{in-place}). En matrices, la ventaja teórica de Strassen ($\mathcal{O}(N^{2.81})$) es anulada en $N \le 1024$ por el colosal costo de gestión dinámica de memoria y la degradación de localidad frente al bucle contiguo de Naive, fuertemente optimizado por el compilador.
+La notación asintótica teórica es insuficiente en entornos reales sin considerar la arquitectura. 
+En el ordenamiento, el orden inicial condiciona fatalmente la partición ingenua en QuickSort (causando \textit{Stack Overflow}) 
+y el número de pilas en PatienceSort, destacando la estabilidad de MergeSort y \texttt{std::sort} (\textit{in-place}). En matrices, la 
+ventaja teórica de Strassen ($\mathcal{O}(N^{2.81})$) es anulada en $N \le 1024$ por el gran costo de gestión dinámica de memoria y 
+la degradación de localidad frente al consecutivo de Naive, fuertemente optimizado por el compilador.
