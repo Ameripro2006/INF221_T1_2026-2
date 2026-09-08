@@ -1,3 +1,8 @@
+/**
+ * Referencias y Bibliografía:
+ * - Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. (2022). Introduction to Algorithms (4th ed.). MIT Press.
+ * - Documentación estándar de C++ (std::sort y algoritmos): https://en.cppreference.com/
+ */
 #include <vector>
 
 

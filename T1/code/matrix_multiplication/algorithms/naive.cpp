@@ -1,3 +1,8 @@
+/**
+ * Referencias y Bibliografía:
+ * - Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. (2022). Introduction to Algorithms (4th ed.). MIT Press.
+ * - Strassen, V. (1969). Gaussian elimination is not optimal. Numerische Mathematik, 13(4), 354-356.
+ */
 #include <vector>
 
 using namespace std;
