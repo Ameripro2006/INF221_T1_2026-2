@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -O2 -std=c++17 -Wall
+CXXFLAGS = -std=c++17 -O2 -Wall -Wextra
 
 TARGET = matrix_multiplication
 SRC = matrix_multiplication.cpp

@@ -1,9 +1,3 @@
-/**
- * Algoritmo de Strassen para Multiplicacion de Matrices
- * Complejidad temporal teorica: Theta(n^(log2(7))) aprox O(n^2.807)
- * Referencia: Strassen, Volker (1969). "Gaussian Elimination is not Optimal".
- */
-
 #include <vector>
 
 using namespace std;

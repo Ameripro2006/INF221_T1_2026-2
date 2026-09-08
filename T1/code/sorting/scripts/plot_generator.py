@@ -15,7 +15,10 @@ def extract_type(archivo):
 
 df['tipo_orden'] = df['archivo'].apply(extract_type)
 
-# Filtrar mediciones válidas mayores a 0
+# Convertir a numérico, transformando TIMEOUT/CRASH en NaN, y eliminar esos NaN
+df['tiempo_ms'] = pd.to_numeric(df['tiempo_ms'], errors='coerce')
+df['memoria_kb'] = pd.to_numeric(df['memoria_kb'], errors='coerce')
+df = df.dropna(subset=['tiempo_ms', 'memoria_kb'])
 df = df[df['tiempo_ms'] > 0]
 
 colores = {
@@ -30,24 +33,17 @@ for tipo in ['aleatorio', 'ascendente', 'descendente']:
     if sub_df.empty:
         continue
 
-    plt.figure(figsize=(9, 6))
-    
-    # Agrupar por algoritmo y tamaño, calculando la media de las réplicas
-    grouped = sub_df.groupby(['algoritmo', 'tamano'])['tiempo_ms'].mean().reset_index()
+    # Agrupar por algoritmo y tamaño, calculando la media
+    grouped = sub_df.groupby(['algoritmo', 'tamano'])[['tiempo_ms', 'memoria_kb']].mean().reset_index()
 
+    # --- GRAFICO DE TIEMPO ---
+    plt.figure(figsize=(9, 6))
     for algo in ['mergesort', 'quicksort', 'sort', 'patiencesort']:
         algo_data = grouped[grouped['algoritmo'] == algo].sort_values('tamano')
         if not algo_data.empty:
-            plt.plot(
-                algo_data['tamano'],
-                algo_data['tiempo_ms'],
-                marker='o',
-                linewidth=2,
-                label=algo,
-                color=colores.get(algo, None)
-            )
+            plt.plot(algo_data['tamano'], algo_data['tiempo_ms'], marker='o', linewidth=2, label=algo, color=colores.get(algo, None))
 
-    plt.title(f"Rendimiento de Algoritmos - Caso {tipo.capitalize()}", fontsize=13, pad=12)
+    plt.title(f"Rendimiento de Tiempo - Caso {tipo.capitalize()}", fontsize=13, pad=12)
     plt.xlabel("Tamaño del Arreglo (n)", fontsize=11)
     plt.ylabel("Tiempo Promedio (ms)", fontsize=11)
     plt.xscale('log')
@@ -55,10 +51,25 @@ for tipo in ['aleatorio', 'ascendente', 'descendente']:
     plt.grid(True, which="both", ls="--", alpha=0.5)
     plt.legend(title="Algoritmo")
     plt.tight_layout()
-
-    out_file = os.path.join(PLOTS_DIR, f"comparativa_{tipo}.png")
-    plt.savefig(out_file, dpi=300)
+    plt.savefig(os.path.join(PLOTS_DIR, f"tiempo_{tipo}.png"), dpi=300)
     plt.close()
-    print(f"Grafico guardado: {out_file}")
 
-print("Proceso finalizado.")
+    # --- GRAFICO DE MEMORIA ---
+    plt.figure(figsize=(9, 6))
+    for algo in ['mergesort', 'quicksort', 'sort', 'patiencesort']:
+        algo_data = grouped[grouped['algoritmo'] == algo].sort_values('tamano')
+        if not algo_data.empty:
+            plt.plot(algo_data['tamano'], algo_data['memoria_kb'], marker='s', linewidth=2, linestyle='--', label=algo, color=colores.get(algo, None))
+
+    plt.title(f"Consumo de Memoria - Caso {tipo.capitalize()}", fontsize=13, pad=12)
+    plt.xlabel("Tamaño del Arreglo (n)", fontsize=11)
+    plt.ylabel("Memoria Máxima (KB)", fontsize=11)
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.grid(True, which="both", ls="--", alpha=0.5)
+    plt.legend(title="Algoritmo")
+    plt.tight_layout()
+    plt.savefig(os.path.join(PLOTS_DIR, f"memoria_{tipo}.png"), dpi=300)
+    plt.close()
+
+print("Graficos de Sorting (Tiempo y Memoria) generados correctamente.")

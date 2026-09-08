@@ -1,68 +1,70 @@
 \subsection{Algoritmos de Ordenamiento}
+El análisis experimental expone una fuerte sensibilidad a la distribución inicial de los datos.
 
-El análisis experimental expuso una clara sensibilidad de los algoritmos frente a la distribución previa de los datos:
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.52\textwidth]{figures/comparativa_aleatorio.png}
-    \caption{Rendimiento en caso aleatorio (escala log-log).}
-    \label{fig:sort_aleatorio}
-\end{figure}
-
-En la Figura \ref{fig:sort_aleatorio}, \texttt{std::sort} y \texttt{QuickSort} logran la menor latencia en arreglos masivos ($N = 10^7$) gracias a la localidad en caché L1/L2. \texttt{MergeSort} conserva estrictamente su tasa $\mathcal{O}(N \log N)$ penalizado por reservas dinámicas auxiliares. \texttt{PatienceSort} mantiene cota asintótica mediante montículos binarios, pero la administración dinámica de múltiples pilas eleva su constante multiplicativa.
-
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{figures/comparativa_ascendente.png}
-        \caption{Caso ordenado ascendente.}
-        \label{fig:sort_asc}
+        \includegraphics[width=\textwidth]{figures/comparativa_aleatorio.png}
+        \caption{Tiempo: Caso aleatorio.}
+        \label{fig:t_aleatorio}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{figures/comparativa_descendente.png}
-        \caption{Caso ordenado descendente.}
-        \label{fig:sort_desc}
+        \includegraphics[width=\textwidth]{figures/memoria_aleatorio.png}
+        \caption{Memoria: Caso aleatorio.}
+        \label{fig:m_aleatorio}
     \end{minipage}
 \end{figure}
 
-Las Figuras \ref{fig:sort_asc} y \ref{fig:sort_desc} evidencian el colapso cuadrático $\mathcal{O}(N^2)$ en implementaciones simples de \texttt{QuickSort} al seleccionar pivotes fijos desbalanceados. En contraposición, \texttt{MergeSort} y \texttt{std::sort} mitigan este efecto preservando tiempos subcuadráticos.
+En la Figura \ref{fig:t_aleatorio}, \texttt{std::sort} logra la menor latencia. QuickSort sufre una degradación catastrófica a $\mathcal{O}(N^2)$ con arreglos ordenados, consumiendo toda la pila (\textit{Stack Overflow}) o excediendo el límite de tiempo para $N \ge 10^6$. MergeSort conserva su tasa teórica $\mathcal{O}(N \log N)$, mientras que PatienceSort mantiene su cota pero con una alta constante multiplicativa. Respecto a la memoria (Figura \ref{fig:m_aleatorio}), \texttt{std::sort} domina operando \textit{in-place}, mientras MergeSort y PatienceSort exhiben un crecimiento $\mathcal{O}(N)$ por sus estructuras auxiliares.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.50\textwidth]{figures/comparativa_dominios_n100k.png}
-    \caption{Impacto del dominio de valores ($N = 10^5$).}
-    \label{fig:sort_dom}
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{figures/comparativa_ascendente.png}
+        \caption{Ascendente.}
+    \end{minipage}\hfill
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{figures/comparativa_descendente.png}
+        \caption{Descendente.}
+    \end{minipage}\hfill
+    \begin{minipage}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{figures/comparativa_dominios_n100k.png}
+        \caption{Dominio ($10^5$).}
+    \end{minipage}
 \end{figure}
-
-En la Figura \ref{fig:sort_dom}, ante cardinalidad reducida de claves repetidas, \texttt{PatienceSort} reduce el número de pilas activas requeridas, mejorando sensiblemente su rendimiento frente a distribuciones aleatorias.
 
 \subsection{Multiplicación de Matrices}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.52\textwidth]{figures/comparativa_global_matrices.png}
-    \caption{Escalamiento general: Naive vs Strassen (escala log-log).}
-    \label{fig:mat_global}
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/comparativa_global_matrices.png}
+        \caption{Tiempo: Naive vs Strassen.}
+        \label{fig:t_matrices}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/memoria_global_matrices.png}
+        \caption{Memoria: Naive vs Strassen.}
+        \label{fig:m_matrices}
+    \end{minipage}
 \end{figure}
 
-En la Figura \ref{fig:mat_global}, \textit{Naive} supera por 2 a 3 órdenes de magnitud a \textit{Strassen} en todos los tamaños evaluados ($N \le 1024$). La división recursiva profunda hasta $1 \times 1$ genera en $N=1024$ un árbol con $\approx 2.82 \times 10^8$ llamadas, saturando el gestor de memoria dinámica.
+Naive supera por órdenes de magnitud a Strassen (Figura \ref{fig:t_matrices}). La recursividad profunda en $N=1024$ genera $\approx 3.29 \times 10^8$ llamadas, asfixiando la ganancia asintótica por el inmenso \textit{overhead}. Esto se refleja en la Figura \ref{fig:m_matrices}: Strassen exige una asignación masiva en el \textit{heap}, mientras Naive mantiene una huella estable $\mathcal{O}(N^2)$. El tiempo demostró ser agnóstico a la estructura y dominio de las matrices, ya que ninguna implementación omite cálculos sobre ceros.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/impacto_tipo_matrices.png}
-        \caption{Estructura interna ($N = 256$).}
-        \label{fig:mat_tipo}
+        \caption{Estructura interna.}
     \end{minipage}\hfill
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/impacto_dominio_matrices.png}
-        \caption{Dominio numérico ($N = 256$).}
-        \label{fig:mat_dominio}
+        \caption{Dominio numérico.}
     \end{minipage}
 \end{figure}
-
-Las Figuras \ref{fig:mat_tipo} y \ref{fig:mat_dominio} confirman que la multiplicación matricial es invariante respecto al contenido de los datos: el número de operaciones es determinista e insensible a la densidad de ceros o al rango numérico evaluado.

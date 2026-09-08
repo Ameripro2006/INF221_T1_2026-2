@@ -1,9 +1,3 @@
-/**
- * Algoritmo Naive de Multiplicacion de Matrices
- * Complejidad temporal: Theta(n^3)
- * Referencia: Definicion clasica de producto matricial (Algebra Lineal)
- */
-
 #include <vector>
 
 using namespace std;

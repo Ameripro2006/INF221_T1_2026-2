@@ -2,7 +2,7 @@
  * Programa principal para medicion de tiempos de multiplicacion de matrices
  * INF-221 Algoritmos y Complejidad
  */
-
+#include <sys/resource.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -60,7 +60,7 @@ int main() {
     fs::create_directories(measurements_dir);
 
     ofstream csv_out(measurements_dir + "results.csv");
-    csv_out << "algoritmo,archivo,tamano,tiempo_ms\n";
+    csv_out << "algoritmo,archivo,tamano,tiempo_ms,memoria_kb\n";
 
     // Recolectar prefijos de casos base a partir de archivos terminados en _1.txt
     vector<string> cases;
@@ -101,7 +101,11 @@ int main() {
         auto stop = high_resolution_clock::now();
         double duration_naive = duration<double, milli>(stop - start).count();
 
-        csv_out << "naive," << base_case << "," << n << "," << duration_naive << "\n";
+        struct rusage usage_naive;
+        getrusage(RUSAGE_SELF, &usage_naive);
+        long memoria_kb_naive = usage_naive.ru_maxrss;
+
+        csv_out << "naive," << base_case << "," << n << "," << duration_naive << "," << memoria_kb_naive << "\n";
         write_matrix(output_dir + base_case + "_out.txt", C_naive);
 
         // 2. Evaluacion Strassen
@@ -110,7 +114,11 @@ int main() {
         stop = high_resolution_clock::now();
         double duration_strassen = duration<double, milli>(stop - start).count();
 
-        csv_out << "strassen," << base_case << "," << n << "," << duration_strassen << "\n";
+        struct rusage usage_strassen;
+        getrusage(RUSAGE_SELF, &usage_strassen);
+        long memoria_kb_strassen = usage_strassen.ru_maxrss;
+
+        csv_out << "strassen," << base_case << "," << n << "," << duration_strassen << "," << memoria_kb_strassen << "\n";
 
         cout << " [Naive: " << duration_naive << " ms | Strassen: " << duration_strassen << " ms]" << endl;
         csv_out.flush();

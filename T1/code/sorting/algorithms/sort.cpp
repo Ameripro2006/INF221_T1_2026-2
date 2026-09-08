@@ -2,6 +2,6 @@
 #include <vector>
 
 std::vector<int> sortArray(std::vector<int>& arr) {
-    std::sort(arr.begin(), arr.end());  // std::sort de la STL
+    std::sort(arr.begin(), arr.end());  
     return arr;
 }
