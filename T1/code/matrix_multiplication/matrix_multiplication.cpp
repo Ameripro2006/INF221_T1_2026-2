@@ -3,6 +3,8 @@
  * INF-221 Algoritmos y Complejidad
  */
 #include <sys/resource.h>
+#include <sys/wait.h> // Necesario para wait()
+#include <unistd.h>   // Necesario para fork()
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -59,8 +61,10 @@ int main() {
     fs::create_directories(output_dir);
     fs::create_directories(measurements_dir);
 
+    // 1. Escribimos la cabecera y cerramos el archivo.
     ofstream csv_out(measurements_dir + "results.csv");
     csv_out << "algoritmo,archivo,tamano,tiempo_ms,memoria_kb\n";
+    csv_out.close();
 
     // Recolectar prefijos de casos base a partir de archivos terminados en _1.txt
     vector<string> cases;
@@ -84,47 +88,62 @@ int main() {
             continue;
         }
 
-        // Obtener dimension n desde el nombre del archivo ({n}_{t}_{d}_{m})
+        // Obtener dimension n desde el nombre del archivo
         stringstream ss(base_case);
         string n_str;
         getline(ss, n_str, '_');
         int n = stoi(n_str);
 
-        cout << "Procesando: " << base_case << " (n=" << n << ")..." << flush;
+        cout << "Procesando: " << base_case << " (n=" << n << ")... " << flush;
 
+        // Leemos las matrices en el proceso padre una sola vez
         vector<vector<int>> A = read_matrix(file_a);
         vector<vector<int>> B = read_matrix(file_b);
 
-        // 1. Evaluacion Naive
-        auto start = high_resolution_clock::now();
-        vector<vector<int>> C_naive = multiply_naive(A, B);
-        auto stop = high_resolution_clock::now();
-        double duration_naive = duration<double, milli>(stop - start).count();
+        // 2. Ejecutamos los algoritmos en procesos separados para resetear ru_maxrss
+        for (string algoritmo : {"naive", "strassen"}) {
+            pid_t pid = fork();
 
-        struct rusage usage_naive;
-        getrusage(RUSAGE_SELF, &usage_naive);
-        long memoria_kb_naive = usage_naive.ru_maxrss;
+            if (pid == 0) {
+                // --- INICIO DEL PROCESO HIJO ---
+                auto start = high_resolution_clock::now();
+                vector<vector<int>> C;
+                
+                if (algoritmo == "naive") {
+                    C = multiply_naive(A, B);
+                } else {
+                    C = multiply_strassen(A, B);
+                }
+                
+                auto stop = high_resolution_clock::now();
+                double duration_ms = duration<double, milli>(stop - start).count();
 
-        csv_out << "naive," << base_case << "," << n << "," << duration_naive << "," << memoria_kb_naive << "\n";
-        write_matrix(output_dir + base_case + "_out.txt", C_naive);
+                struct rusage usage;
+                getrusage(RUSAGE_SELF, &usage);
+                long memoria_kb = usage.ru_maxrss;
 
-        // 2. Evaluacion Strassen
-        start = high_resolution_clock::now();
-        vector<vector<int>> C_strassen = multiply_strassen(A, B);
-        stop = high_resolution_clock::now();
-        double duration_strassen = duration<double, milli>(stop - start).count();
+                // Abrir en modo APPEND para no sobreescribir lo de los otros procesos
+                ofstream csv_app(measurements_dir + "results.csv", ios::app);
+                csv_app << algoritmo << "," << base_case << "," << n << "," << duration_ms << "," << memoria_kb << "\n";
+                csv_app.close();
 
-        struct rusage usage_strassen;
-        getrusage(RUSAGE_SELF, &usage_strassen);
-        long memoria_kb_strassen = usage_strassen.ru_maxrss;
+                if (algoritmo == "naive") {
+                    write_matrix(output_dir + base_case + "_out.txt", C);
+                }
+                
+                exit(0); 
+              
 
-        csv_out << "strassen," << base_case << "," << n << "," << duration_strassen << "," << memoria_kb_strassen << "\n";
-
-        cout << " [Naive: " << duration_naive << " ms | Strassen: " << duration_strassen << " ms]" << endl;
-        csv_out.flush();
+            } else if (pid > 0) {
+                
+                wait(NULL); 
+            } else {
+                cerr << "Error al crear el proceso hijo (fork)." << endl;
+            }
+        }
+        cout << "[Completado]" << endl;
     }
 
-    csv_out.close();
     cout << "\nExperimentos completados con exito. Archivo guardado en " << measurements_dir << "results.csv\n";
     return 0;
 }

@@ -57,7 +57,7 @@ for algo in algoritmos:
         except subprocess.TimeoutExpired:
             print(f"TIMEOUT (Superó los {TIMEOUT_SEC}s)")
             
-            with open(CSV_FILE, "a") as f:cd code/sorting/
+            with open(CSV_FILE, "a") as f:
                 f.write(f"{algo},{archivo_name},{tamano},TIMEOUT,TIMEOUT,no\n")
 
 print("\n¡Benchmarks finalizados! Revisa data/measurements/results.csv")

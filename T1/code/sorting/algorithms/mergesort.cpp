@@ -67,7 +67,6 @@ void mergeSort(std::vector<int>& arr) {
     mergeSortRecursive(arr, temp, 0, static_cast<int>(arr.size()) - 1);
 }
 
-
 std::vector<int> sortArray(std::vector<int>& arr) {
     mergeSort(arr);
     return arr;

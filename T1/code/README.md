@@ -33,7 +33,6 @@ Algoritmos evaluados: **Naive clasico** y **Strassen**
 ### Scripts
 
 * `scripts/matrix_generator.py`: Genera las matrices sinteticas segun dimension, estructura y dominio numerico, guardandolas en `data/matrix_input/`
-* `scripts/run_benchmarks.py`: Compila y ejecuta `matrix_multiplication`.
 * `scripts/plot_generator.py`: Lee `data/measurements/results.csv` y genera los graficos comparativos de tiempo y memoria en `data/plots/`
 
 ## Ordenamiento de arreglo unidimensional

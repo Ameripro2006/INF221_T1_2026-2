@@ -6,7 +6,6 @@
 #include <vector>
 #include <utility> 
 
-
 int partition(std::vector<int>& arr, int left, int right) {
     int pivot = arr[right]; // Pivote: último elemento del rango
     int i = left - 1;       // Frontera de los elementos menores o iguales al pivote
@@ -24,7 +23,6 @@ int partition(std::vector<int>& arr, int left, int right) {
     
     return i + 1; // Retorna el indice de la posicion final del pivote
 }
-
 
 void quickSortRecursive(std::vector<int>& arr, int left, int right) {
     // Caso base: subarreglo de 0 o 1 elemento (left >= right)
@@ -44,10 +42,8 @@ void quickSortRecursive(std::vector<int>& arr, int left, int right) {
 
 std::vector<int> sortArray(std::vector<int>& arr) {
     if (arr.size() <= 1) {
-        return arr;
+        return arr; 
     }
-
     quickSortRecursive(arr, 0, static_cast<int>(arr.size()) - 1);
-
-    return arr;
+    return arr;     
 }

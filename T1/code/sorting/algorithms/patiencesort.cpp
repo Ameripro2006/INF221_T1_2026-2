@@ -11,7 +11,6 @@ struct HeapNode {
     int val;        
     int pile_idx;   
 
-   
     bool operator>(const HeapNode& other) const {
         return val > other.val;
     }
@@ -38,7 +37,6 @@ std::vector<int> sortArray(std::vector<int>& arr) {
         }
     }
 
-    
     std::priority_queue<HeapNode, std::vector<HeapNode>, std::greater<HeapNode>> min_heap;
 
     for (int i = 0; i < static_cast<int>(piles.size()); ++i) {
@@ -61,6 +59,5 @@ std::vector<int> sortArray(std::vector<int>& arr) {
             piles[p_idx].pop_back();
         }
     }
-
     return arr;
 }
